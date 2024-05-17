@@ -15,6 +15,7 @@ public class GraphicsPanel extends JPanel implements KeyListener, MouseListener,
     private Timer timer;
     private int time;
     private JButton reset;
+    private JButton pause;
 
     public GraphicsPanel(String name) {
         try {
@@ -32,6 +33,10 @@ public class GraphicsPanel extends JPanel implements KeyListener, MouseListener,
         reset.setFocusable(false);
         add(reset);
         reset.addActionListener(this);
+        pause = new JButton("Pause");
+        pause.setFocusable(false);
+        add(pause);
+        pause.addActionListener(this);
         addKeyListener(this);
         addMouseListener(this);
         setFocusable(true); // this line of code + one below makes this panel active for keylistener events
@@ -71,6 +76,7 @@ public class GraphicsPanel extends JPanel implements KeyListener, MouseListener,
         g.drawString(player.getName() + "'s Score: " + player.getScore(), 20, 40);
         g.drawString("Time: " + time, 20, 70);
         reset.setLocation(20, 80);
+        pause.setLocation(20, 90);
 
         // player moves left (A)
         if (pressedKeys[65]) {
