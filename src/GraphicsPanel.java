@@ -46,6 +46,13 @@ public class GraphicsPanel extends JPanel implements KeyListener, MouseListener,
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);  // just do this
+
+        if (player.getScore() >= 10 && !changed) {
+            background = background2; // Change the background once
+            player.changeSprites("src/mariofrogleft.png", "src/mariofrogright.png"); // Change sprites once
+            changed = true;
+        }
+
         g.drawImage(background, 0, 0, null);  // the order that things get "painted" matter; we put background down first
         g.drawImage(player.getPlayerImage(), player.getxCoord(), player.getyCoord(), null);
 
@@ -61,22 +68,13 @@ public class GraphicsPanel extends JPanel implements KeyListener, MouseListener,
                 i--;
             }
         }
-        if (player.getScore() >= 10){
-            try {
-                background  = ImageIO.read(new File("src/background2.png"));
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
-            g.drawImage(background, 0 ,0, null);
-            g.drawImage(player.getPlayerImage(), player.getxCoord(), player.getyCoord() - 35, null);
-        }
 
         // draw score
         g.setFont(new Font("Courier New", Font.BOLD, 24));
         g.drawString(player.getName() + "'s Score: " + player.getScore(), 20, 40);
         g.drawString("Time: " + time, 20, 70);
         reset.setLocation(20, 80);
-        pause.setLocation(20, 90);
+        pause.setLocation(20, 110);
 
         // player moves left (A)
         if (pressedKeys[65]) {
@@ -142,14 +140,37 @@ public class GraphicsPanel extends JPanel implements KeyListener, MouseListener,
     // ACTIONLISTENER INTERFACE METHODS: used for buttons AND timers!
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof Timer) {
-            time++;
-        } else if(e.getSource() instanceof JButton){
-            coins.clear();
-            player.setScore(0);
-            player.setLocation(50,435);
-            time = 0;
-            player.faceRight();
-            requestFocusInWindow();
+            if (!paused) {
+                time++;
+            }
+        } else if (e.getSource() instanceof JButton) {
+            JButton source = (JButton) e.getSource();
+            if (source == reset) {
+                try {
+                    background = ImageIO.read(new File("src/background.png"));
+                } catch (IOException I) {
+                    System.out.println(I.getMessage());
+                }
+                player.changeSprites("src/marioleft.png", "src/marioright.png");
+                background = background;
+                changed = !changed;
+                coins.clear();
+                player.setScore(0);
+                player.setLocation(50, 435);
+                time = 0;
+                player.faceRight();
+                paused = false;
+                timer.start();
+                requestFocusInWindow();
+            } else if (source == pause) {
+                paused = !paused;
+                if (paused) {
+                    timer.stop();
+                } else {
+                    timer.start();
+                }
+                repaint();
+            }
         }
     }
 }
